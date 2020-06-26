@@ -1,0 +1,70 @@
+#Installing LAMP (Linux, Apache, MariaDB, PHP/PhpMyAdmin) on centOS/RHEL 7
+
+#Install Apache Server 
+yum install httpd 
+
+#Check the httpd service status 
+service httpd status 
+
+#Managing the httpd service (any of these command)
+systemctl status|start|stop|restart|reload httpd
+
+#Using firewall-cmd (to manage iptable through firewalld daemon)
+firewall-cmd --add-service=http 
+
+#Take full effect toward firewalld service 
+firewall-cmd --permenant --add-service=http 
+systemctl restart firewalld
+
+#Other import Firewalld options 
+firewall-cmd --state
+firewall-cmd --list-all 
+firewall-cmd --list-interfaces 
+firewall-cmd --get-service 
+firewall-cmd --query-service service_name 
+firewall-cmd --add-port=8080/tcp 
+
+#Apache welcome confiiguration file 
+vim /etc/httpd/conf.d/welcome.conf
+
+#Checking Browser Page 
+systemctl restart httpd 
+
+#Install PHP for Apache (some of the required PHP module)
+yum install php php-mysql php-pdo php-gd php-mbstring 
+
+#List of the full information on PHP from your browser 
+echo "<?php phpinfo(); ?>" > /var/www/html/info.php
+systemctl restart httpd 
+
+#Install and configure MariaDB Database 
+yum install mariadb-server mariadb 
+
+#Start mariaadb by using a systemctl and use mysql secure installation to secure database 
+systemctl start mariadb 
+mysql_secure_installation 
+
+#test the database to functionally login to MariaDB 
+mysql -u root -p 
+MariaDB > SHOW VARIABLES;
+MariaDB > quit 
+
+#Install PhpMyAdmin 
+yum install http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
+yum install phpmyadmin 
+
+#Configure PhpMydmin to allow connctions from remote hosts 
+vim /etc/httpd/conf.d/phpmyadmin.conf 
+
+#Pound signs on lines  
+	#Order Deny,Allow
+	#Deny from all
+	#Allow from 127.0.0.1
+systemctl restart httpd 
+
+#Enable LAMP System-wide 
+systemctl enable mariadb 
+systemctl enable httpd 
+
+
+
