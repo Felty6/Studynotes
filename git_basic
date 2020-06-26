@@ -24,7 +24,7 @@ git init
 git remote add origin <link-repository-path>
 
 #Step 3: Add all changes to commit 
-git add <file-naame or folder-name>
+git add <file-name or folder-name>
 git commit -m "Your messages" 
 
 #step 4: Send changes 
