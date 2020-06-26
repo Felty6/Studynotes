@@ -1,0 +1,62 @@
+#Installing prerequisite to create and manage RAID 
+yum install mdadm 
+
+#Setting up a Partition for RAID1 (same goes for other partition)
+fdisk /dev/sdb
+fdisk /dev/sdc
+
+#Follow the steps to create a partition and setting it to Linux raid automodifier 
+	# Press 'n' to create partition 
+	# 'P' for primary partition 
+	# then, select the partition number as 1
+	# set the storage size that you want to set (press enter for the first), then select the storage size (Ex. +5G)
+	# check your defined parition by pressing 'p'
+	# press the 'L' to see the available types  
+	# type 't' to choose the partitions
+	# choose 'fd' for Linux raid automodifier 
+	# press'p' to check the newly changes to the partition
+
+#Verify the changes that was being made
+mdadm -E  /dev/sd[b-c]
+
+#Creating RAID1 Devices
+mdadm --create /dev/md0 --level=mirror --raid-devices=2 /dev/sd[b-c]1 
+cat /proc/mdstat 
+
+#Check the raid devices type and raid array
+mdadm -E /dev/sd[b-c]1
+mdadm --detail /dev/md0
+
+#Create a filesystem on RAID Device 
+mkfs.ext4 /dev/md0
+
+#Mount the craeted filesystem under /mnt/raid1 and create a file to keep progress 
+mkdir /mnt/raid1
+mount /dev/md0 /mnt/raid1/
+touch /mnt/raid1/felty.txt
+echo "Felty RAID1 Setup" > /mnt/raid1/felty.txt
+
+#auto-mount for RAID1 on system reboot, make the entry in /etc/fstab (recommended)
+vim /etc/fstab 
+
+#Input in order 
+/dev/md0	/mnt/raid1	ext4	defaults	0 0
+
+#Run mount -a to check if there is any error on the /etc/fstab entry 
+mount -av
+
+#Save raid configuration manually 
+mdadm --detail --scan --verbose >> /etc/mdadm.conf  
+
+#Try to verify the data after the disk failure 
+mdadm --detail /dev/md0
+
+#Remove one of the device to test out 
+mdadm -r /dev/md0 /dev/sdc1 
+
+#Add one of the device that you have 
+mdadm -a /dev/md0 /dev/sdc1
+
+#Check the rebuild status 
+mdadm --detail /dev/md0
+

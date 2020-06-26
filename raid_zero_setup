@@ -1,0 +1,67 @@
+#RAID 0 Configuration
+#Install the mdadm package 
+yum install mdadm -y
+
+#Check your storage device
+lsblk
+
+#Create the partition 
+fdisk /dev/sdd
+fdisk /dev/sde
+
+#Follow the steps to create a partition and setting it to Linux raid automodifier 
+          # Press 'n' to create partition 
+          # 'P' for primary partition 
+          # then, select the partition number as 1
+          # set the storage size that you want to set (press enter for the first), then select     the storage size (Ex. +5G)
+	  # check your defined parition by pressing 'p'
+          # press the 'L' to see the available types  
+          # type 't' to choose the partitions
+          # choose 'fd' for Linux raid automodifier 
+          # press'p' to check the newly changes to the partition
+
+#Check the block details for partition 
+mdadm -E /dev/sd[d-e]1 
+
+#Create a md device and selecting the RAID 0
+mdadm --create /dev/md1 --level-stripe --raid-device=2 /dev/sd[d-e]1  
+
+#Check the status of the RAID level
+mdadm -E /dev/sd[d-e]1
+
+#It is always good to check the md device status 
+mdadm --detail /dev/md1
+
+#Create a filesystem for md device 
+mkfs.ext4 /dev/md1
+
+#Mount permenantly, (you can also use blkid and copy the UUID)
+mkdir /mnt/raid0
+blkid /dev/md1 
+
+#To leave a file under the raid0 directory 
+touch /mnt/raid0/felty.txt | echo "Felty RAID0 Setup" > /mnt/raid0/felty.txt
+
+#The result from blkid command 
+/dev/md1: UUID="5e295938-794a-486e-99fb-b529aec74d5c" TYPE="ext4"
+
+#Go to /etc/fstab to input 
+vim /etc/fstab 
+
+#Input in order 
+UUID=5e295938-794a-486e-99fb-b529aec74d5c	/mnt/raid0	ext4	defaults	0 0
+#OR
+/dev/md1	/mnt/raid0	ext4	defaults	0 0
+
+#Verify if the status of the device is updated (mount -av to check if there is error on /etc/fstab)
+mount -av 
+df -h 
+
+#Remove one of the device to test out 
+mdadm -r /dev/md0 /dev/sdc1
+  
+#Add one of the device that you have 
+mdadm -a /dev/md0 /dev/sdc1
+  
+#Check the rebuild status 
+mdadm --detail /dev/md0
