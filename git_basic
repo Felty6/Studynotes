@@ -1,0 +1,35 @@
+#Check your Git Version
+git --version 
+
+#Configure Credential for Git 
+git config --global user.name "$YOUR_USERNAME"
+git config --global user.email "$YOUR_EMAIL@EXAMPLE.COM"
+
+#Check your Configuration
+git config --global --list
+
+#Git clone 
+git clone https://gitlab.com/gitlab-org/gitlab.git
+
+#View your remote repositories 
+git remote -v 
+
+#Change your remote repositories
+git remote set-url origin https://github.com/Felty6/studynotes
+
+#Step 1: Initialization for git  
+git init
+
+#step 2: (Add/change) your remote depository 
+git remote add origin <link-repository-path>
+
+#Step 3: Add all changes to commit 
+git add <file-naame or folder-name>
+git commit -m "Your messages" 
+
+#step 4: Send changes 
+git push origin master 
+
+---Important---
+#Downloading the latest changes in the project 
+git pull <REMOTE> <name_of_the_branch>
