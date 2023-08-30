@@ -1,2 +1,1 @@
-# studynotes
-Studynotes that comes in handy
+# Shell Scripting Test
